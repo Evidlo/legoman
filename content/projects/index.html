@@ -1,7 +1,0 @@
-{% extends "base.html" %}
-
-{% block main %}
-{% for project in path('projects/**/*.md', 'projects/**/*.rst') %}
-<li>{{ project.title }}{{ project.path }}</li>
-{% endfor %}
-{% endblock %}

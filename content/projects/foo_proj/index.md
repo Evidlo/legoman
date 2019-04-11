@@ -1,7 +1,8 @@
 ----
 author: evan
 template: project.html
-title: foobar
+title: Markdown and math
+description: Demonstrating various formatting features
 ----
 
 [TOC]
@@ -11,8 +12,6 @@ title: foobar
 $$3x + 4y$$
 
 $$\int 3x + 2y = abcdef$$
-
-inline math --> $3x + 4$ <-- inline math
 
 # hello 2
 

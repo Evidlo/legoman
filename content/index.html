@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block main %}
+<h1>Legoman Demo</h1>
+<h2>Projects</h2>
 {% for project in path('projects/**/*.md', 'projects/**/*.rst') %}
-<p><a href="{{ project.path }}"><code>{{ project.title }}</code></a> - foo</p>
+<p><a href="{{ project.path }}"><code>{{ project.title }}</code></a> - {{ project.description }}</p>
 {% endfor %}
 {% endblock %}
