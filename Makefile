@@ -6,7 +6,7 @@ html:
 	python legoman.py
 
 requirements:
-	pip install jinja2 markdown python-markdown-math
+	pip install jinja2 markdown python-markdown-math httpwatcher
 
 devserver:
 	# kill backgrounded process on exit
