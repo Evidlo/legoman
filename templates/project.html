@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <article>
+    <header>
+      <h1>{{ title }}</h1>
+      <time datetime="{{ date }}">{{ date }}</time>
+    </header>
+    {{ content }}
+    <footer>
+    <p>Evan Widloski</p>
+    </footer>
+  </article>
+{% endblock %}

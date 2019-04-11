@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang=en>
+
+{% macro project_img(src,desc='') -%}
+    <img style="display:block;" src="{{src}}">
+    <span>{{desc}}</span>
+{%- endmacro %}
+
+{% set fruit = "Banana" %}
+{%- from "jinja.html" import render_macros %}
+
+{%- set allowed = {"fruit": fruit, "project_img": project_img} %}
+
+<head>
+  <title>{% block title %}{% if page_title %}{{ page_title }}{% endif %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" type="text/css" href="/styles.css" />
+  <link rel="stylesheet" type="text/css" href="/codehilite.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css" integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js" integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+</head>
+<body>
+<main>
+    {% block main %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,77 @@
+{# run Jinja-expressions from markdown
+
+Often, it's useful to use placeholders or functions in Markdown.
+This can be done via the Jinja-template, by defining using placeholders
+in Markdown and replacing them with the result of Jinja-macros.
+
+Usage:
+- Markdown:
+
+    {{ myvariable }}
+    {{ myfunc(http://example.com/foo.png, desc=Description }}
+
+- Template:
+
+    {% macro myfunc(src,desc='') -%}
+        <img style="display:block;" src="{{src}}">
+        <span>{{desc}}</span>
+    {%- endmacro %}
+
+    {% set myvariable = "Hello world!" %}
+
+    {%- from "jinja.html" import jinja %}
+    {%- set allowed = {"myfunc": myfunc, "myvariable": myvariable} %}
+    {{ jinja(page_content, allowed) }}
+
+Version: 2019-02-28
+Author:  Roland Koebler <rk@simple-is-better.org>
+Author:  Evan Widloski <evan@evanw.org>
+#}
+{%- macro render_macros(s, expressions) %}
+    {%- if "{{ " not in s  or  " }}" not in s %}
+        {{- s }}
+    {%- else %}
+        {%- set parts = s.split("{{") %}
+        {{- parts[0] }}
+
+        {# render each function/variable, then the context up to the next func/var #}
+        {%- for part in parts[1:] %}
+            {%- set expr_parts = part.split("}}") %}
+            {%- set expression = expr_parts[0].strip(" ") %}
+            {%- set rest = "".join(expr_parts[1:]) %}
+
+            {# handle functions #}
+            {%- if "(" in expression %}
+                {%- set func_parts = expression.split("(") %}
+                {%- set func_name = func_parts[0] %}
+                {%- set arguments = "".join(func_parts[1:]).rstrip(")").split(",") %}
+
+                {# handle args and kwargs #}
+                {%- set args = [] %}
+                {%- set kwargs = {} %}
+                {%- for argument in arguments %}
+                    {%- if "=" in argument %}
+                        {%- set kwarg_parts = argument.strip(" ").split("=") %}
+                        {# just a hack for kwargs[kwarg_parts[0]] = kwarg_parts[1] #}
+                        {%- set _ = kwargs.__setitem__(kwarg_parts[0], kwarg_parts[1]) %}
+                    {%- else -%}
+                        {%- set _ = args.append(argument) -%}
+                    {%- endif %}
+                {%- endfor %}
+
+                {# call the function #}
+                {%- if func_name in expressions %}
+                    {{- expressions[func_name](*args, **kwargs) }}
+                {%- endif %}
+
+            {# handle regular variables #}
+            {%- else %}
+                {%- if expression in expressions %}
+                    {{- expressions[expression] }}
+                {%- endif %}
+            {%- endif %}
+
+            {{- rest }}
+        {%- endfor %}
+    {%- endif %}
+{%- endmacro %}
