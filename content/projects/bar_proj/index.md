@@ -1,9 +1,9 @@
 ---
 author: evan
-template: project.html
+template: project.j2
 date: 2019-09-09
-title: testing the bizz nizz
-description: another project
+title: Fizz buzz
+description: an empty project
 ---
 
 hello world

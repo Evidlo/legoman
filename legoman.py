@@ -42,7 +42,7 @@ for content_file in content_dir.rglob('*'):
 
     elif content_file.suffix == '.j2':
         template = env.get_template(content_file.as_posix())
-        output_file.write_text(template.render(path=jinja_path))
+        output_file.with_suffix('.html').write_text(template.render(path=jinja_path))
 
     elif content_file.is_file():
         if output_file.is_symlink():

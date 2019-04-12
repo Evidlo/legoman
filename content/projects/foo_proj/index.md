@@ -1,32 +1,31 @@
 ----
 author: evan
-template: project.html
-title: Markdown and math
+template: project.j2
+title: Formatting and math demo
 description: Demonstrating various formatting features
 ----
 
 [TOC]
 
-# math
-
-$$3x + 4y$$
-
-$$\int 3x + 2y = abcdef$$
-
-# hello34
-
-this is a test!!!!!!!!!!!!!!
+# Images
 
 ![foo](cheetos_small.png)
 ![foo](cheetos_small.png "wwwwwww")
 ![foo](cheetos_small.png "wwwwwww")
 
-- this is a test
-- test 2
+* bullet1
+* bullet2
+    * sub bullet
+    
+# Math
 
-# we are not the same
+$$3x + 4y$$
 
-## I am a martian
+$$\int 3x + 2y = abcdef$$
+
+# Heading 1
+
+### Heading 3
 
 ``` python
 print('hello world')
