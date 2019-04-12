@@ -1,10 +1,10 @@
-from pathlib import Path
+import pathlib
 from jinja2 import Environment, FileSystemLoader, Template
 import markdown
 
-content_dir = Path('content')
-template_dir = Path('templates')
-output_dir = Path('output')
+content_dir = pathlib.Path('content')
+template_dir = pathlib.Path('templates')
+output_dir = pathlib.Path('output')
 md = markdown.Markdown(
     extensions=['meta', 'codehilite', 'fenced_code', 'toc', 'attr_list',
                 'tables', 'toc']
@@ -28,7 +28,7 @@ def jinja_path(*patterns):
 for content_file in content_dir.rglob('*'):
     output_file = output_dir.joinpath(content_file.relative_to(content_dir))
     output_file.parent.mkdir(exist_ok=True)
-    print(f'parsing {content_file}')
+    print('parsing ' + content_file.as_posix())
 
     if content_file.suffix.lower() == '.md':
         html = md.convert(content_file.read_text())
@@ -45,6 +45,6 @@ for content_file in content_dir.rglob('*'):
         output_file.with_suffix('.html').write_text(template.render(path=jinja_path))
 
     elif content_file.is_file():
-        if output_file.is_symlink():
+        if output_file.is_file():
             output_file.unlink()
-        output_file.symlink_to(content_file.resolve())
+        pathlib.os.link(content_file.resolve(), output_file)

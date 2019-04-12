@@ -4,13 +4,18 @@
 
 A tiny static generator in 50 lines.
 
+[Demo](http://evanw.org/projects/legoman_demo)
+
 # Usage
 
 Building the example
 
-```
+``` bash
 # install requirements
 make requirements
+
+# build html
+make
 
 # run devserver (requires inotify-tools)
 make devserver
@@ -39,15 +44,15 @@ content
 yields this `output/`
 ```
 output
-├── codehilite.css -> /home/evan/resources/legoman/content/codehilite.css
+├── codehilite.css
 ├── index.html
 ├── projects
 │   ├── bar_proj
 │   │   └── index.html
 │   └── foo_proj
-│       ├── cheetos_small.png -> ~/legoman/content/projects/foo_proj/cheetos_small.png
+│       ├── cheetos_small.png
 │       └── index.html
-└── styles.css -> ~/legoman/content/styles.css
+└── styles.css
 ```
 
 # See also

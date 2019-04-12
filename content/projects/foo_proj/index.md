@@ -1,6 +1,7 @@
 ----
 author: evan
 template: project.j2
+date: 2019-04-09
 title: Formatting and math demo
 description: Demonstrating various formatting features
 ----
@@ -21,7 +22,7 @@ description: Demonstrating various formatting features
 
 $$3x + 4y$$
 
-$$\int 3x + 2y = abcdef$$
+$$[Rf]\(t, \theta\) = \int_{\mathbb{R}^2} f(x)\delta(N_{\theta}^T x - t)\, dx$$
 
 # Heading 1
 
