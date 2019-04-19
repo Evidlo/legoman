@@ -40,3 +40,8 @@ a:hover {
 ::selection {
     background-color: #fff888;
 }
+
+.inline {
+    display: inline-block;
+    margin: 2rem auto;
+}

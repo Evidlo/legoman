@@ -2,20 +2,20 @@
 
 ![logo](https://i.imgur.com/VJGdOWe.png)
 
-A tiny static generator in 50 lines.
+A tiny static web generator in 60 lines.
+
+Supports TOC, image captions, LaTeX, code highlighting and tables.
 
 [Demo](http://evanw.org/projects/legoman_demo)
 
 # Usage
 
-Building the example
-
 ``` bash
-# install requirements
-make requirements
+pip install legoman
 
-# build html
-make
+# in an empty directory
+legoman init
+make html
 
 # run devserver (requires inotify-tools)
 make devserver
@@ -23,11 +23,11 @@ make devserver
 
 # How it works
 
-- `.md` files will be rendered using the specified template in `templates/`
-- `.j2` files are rendered with Jinja2, they can loop over `.md` files and access their metadata
+- `.md` files are rendered using the template specified in their frontmatter
+- `.j2` files are rendered with Jinja2. They can loop over `.md` files and access their metadata
 - all other files are symlinked to `output/`
 
-For example, the example `content/`:
+For example, the demo `content/`:
 ```
 content
 ├── codehilite.css
