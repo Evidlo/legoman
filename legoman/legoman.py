@@ -1,13 +1,12 @@
-import pathlib
+from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, Template
 import markdown
 import click
-import shutil
+from distutils.dir_util import copy_tree
 import pkg_resources
+import os
 
-content_dir = pathlib.Path('content')
-template_dir = pathlib.Path('templates')
-output_dir = pathlib.Path('output')
+content_dir, template_dir, output_dir = Path('content'), Path('templates'), Path('output')
 md = markdown.Markdown(
     extensions=['meta', 'codehilite', 'fenced_code', 'toc', 'attr_list',
                 'tables', 'toc', 'markdown_captions', 'mdx_include']
@@ -52,11 +51,11 @@ def build():
         elif content_file.is_file():
             if output_file.is_file():
                 output_file.unlink()
-            pathlib.os.link(content_file.resolve(), output_file)
+            os.link(content_file.resolve(), output_file)
 
 @click.command(short_help="initialize project", help="initialize project")
 def init():
-    shutil.copy(pkg_resources.resource_filename(__name__, 'demo/'), '.')
+    copy_tree(pkg_resources.resource_filename(__name__, 'demo/'), '.')
 
 main.add_command(build)
 main.add_command(init)

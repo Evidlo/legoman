@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 
 html: output
-	legoman
+	legoman build
 
 devserver: output
 	# kill backgrounded process on exit
@@ -12,10 +12,10 @@ devserver: output
 	# serve content
 	httpwatcher --root output --watch content,templates --port 8000 &
 	# wait for change and rebuild
-	legoman
+	legoman build
 	while :; do
 		inotifywait -r -e modify --format %w content templates
-		legoman
+		legoman build
 	done
 
 publish: html
