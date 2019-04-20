@@ -24,7 +24,8 @@ setup(
         "httpwatcher",
         "mdx_include",
         "markdown_captions",
-        "ghp-import"
+        "ghp-import",
+        "click"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

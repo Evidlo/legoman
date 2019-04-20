@@ -51,7 +51,7 @@ def build():
         elif content_file.is_file():
             if output_file.is_file():
                 output_file.unlink()
-            os.link(content_file.resolve(), output_file)
+            os.link(str(content_file), str(output_file))
 
 @click.command(short_help="initialize project", help="initialize project")
 def init():

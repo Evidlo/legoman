@@ -1,3 +1,5 @@
 output/
+build/
+dist/
 legoman.egg-info
 __pycache__

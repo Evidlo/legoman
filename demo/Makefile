@@ -1,6 +1,7 @@
 .ONESHELL:
 .SILENT:
 SHELL := /bin/bash
+.SHELLFLAGS := -ec
 
 html: output
 	legoman build
