@@ -57,3 +57,4 @@ output
 
 # See also
 - [Hugo](https://github.com/gohugoio/hugo) - similar idea, but written in Go and uses Go's templating engine
+- [Dozens of other static website generators](https://www.staticgen.com/)

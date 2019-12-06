@@ -1,0 +1,12 @@
+{% extends "base.j2" %}
+{# the default template for markdown #}
+
+{% block main %}
+  <article>
+    <header>
+      <h1>{{ title }}</h1>
+      <time datetime="{{ date }}">{{ date }}</time>
+    </header>
+    {{ content }}
+  </article>
+{% endblock %}

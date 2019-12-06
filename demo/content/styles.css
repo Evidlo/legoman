@@ -45,3 +45,7 @@ a:hover {
     display: inline-block;
     margin: 2rem auto;
 }
+
+iframe {
+    border: None;
+}
