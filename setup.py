@@ -3,7 +3,7 @@ from pathlib import Path
 
 setup(
     name='legoman',
-    version='1.post1',
+    version='2',
     packages=['legoman'],
     author="Evan Widloski",
     author_email="evan@evanw.org",
