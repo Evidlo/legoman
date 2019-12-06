@@ -8,8 +8,15 @@ import os
 
 content_dir, template_dir, output_dir = Path('content'), Path('templates'), Path('output')
 md = markdown.Markdown(
-    extensions=['meta', 'codehilite', 'fenced_code', 'toc', 'attr_list',
-                'tables', 'toc', 'markdown_captions', 'mdx_include']
+    extensions=['meta', 'codehilite', 'toc', 'attr_list', 'fenced_code', 'extra',
+                'tables', 'toc', 'markdown_captions', 'mdx_include', 'mdx_math',
+                'footnotes'
+    ],
+    extension_configs = {
+        'mdx_math': {
+            'enable_dollar_delimiter': True
+        }
+    }
 )
 env = Environment(
     loader=FileSystemLoader(['templates', '.']), trim_blocks=True, lstrip_blocks=True
@@ -35,14 +42,15 @@ def build():
         print('parsing ' + content_file.as_posix())
 
         if content_file.suffix.lower() == '.md':
-            html = md.convert(content_file.read_text())
-            if 'template' in md.Meta:
-                template = env.get_template(
-                    template_dir.joinpath(md.Meta['template'][0]).as_posix()
-                )
-                output_file.with_suffix('.html').write_text(
-                    template.render(**{k:v[0] for k, v in md.Meta.items()}, content=html)
-                )
+            html = md.reset().convert(content_file.read_text())
+            if not 'template' in md.Meta:
+                md.Meta['template'] = ['default.j2']
+            template = env.get_template(
+                template_dir.joinpath(md.Meta['template'][0]).as_posix()
+            )
+            output_file.with_suffix('.html').write_text(
+                template.render(**{k:v[0] for k, v in md.Meta.items()}, content=html)
+            )
 
         elif content_file.suffix == '.j2':
             template = env.get_template(content_file.as_posix())

@@ -3,7 +3,7 @@ from pathlib import Path
 
 setup(
     name='legoman',
-    version=1,
+    version='1.post1',
     packages=['legoman'],
     author="Evan Widloski",
     author_email="evan@evanw.org",
@@ -19,6 +19,7 @@ setup(
     },
     install_requires=[
         "jinja2",
+        "colorama",
         "markdown",
         "python-markdown-math",
         "httpwatcher",
