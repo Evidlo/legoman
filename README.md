@@ -1,12 +1,12 @@
 # legoman
 
-![logo](https://i.imgur.com/VJGdOWe.png)
+<img src="demo/content/man.svg" width=200>
 
-A tiny static web generator in 60 lines.
+Simple static website generator.
 
 Supports TOC, image captions, LaTeX, code highlighting and tables.
 
-[Demo](http://evanw.org/projects/legoman_demo)
+[Demo](http://evanw.org)
 
 # Usage
 
