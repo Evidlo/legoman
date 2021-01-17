@@ -3,7 +3,7 @@ from pathlib import Path
 
 setup(
     name='legoman',
-    version='3.0.0',
+    version='3.0.1',
     packages=['legoman'],
     author="Evan Widloski",
     author_email="evan@evanw.org",
@@ -15,8 +15,11 @@ setup(
     keywords="static web generator jinja2 markdown",
     url="https://github.com/evidlo/legoman",
     entry_points={
-        'console_scripts': ['legoman = legoman.legoman:main']
+        'console_scripts': [
+            'legoman = legoman.legoman:main',
+        ],
     },
+    scripts=['legoman/legoman_cgi'],
     install_requires=[
         "jinja2",
         "colorama",

@@ -16,7 +16,6 @@ import sys
 def main(ctx, debug, content_dir, output_dir, template_dir):
     if debug:
         click.echo("Debugging enabled...")
-    # global content_dir, output_dir, template_dir
     ctx.content_dir = Path(content_dir)
     ctx.output_dir = Path(output_dir)
     ctx.j2env = Environment(loader=FileSystemLoader([template_dir]))
@@ -120,7 +119,7 @@ def build(ctx):
 
 
 @main.command(short_help="read file from stdin", help="read file from stdin")
-@click.argument("filetype", type=click.Choice(['md', 'j2']))
+@click.argument("filetype", envvar='FILETYPE', type=click.Choice(['md', 'j2']))
 @click.pass_context
 def cgi(ctx, filetype):
     """Render text from stdin"""
