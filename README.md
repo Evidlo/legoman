@@ -70,12 +70,17 @@ Or for serving markdown with lighttpd:
     Usage: legoman [OPTIONS] COMMAND [ARGS]...
 
     Options:
-      --help  Show this message and exit.
+      --debug
+      --content_dir PATH
+      --output_dir PATH
+      --template_dir PATH
+      --help               Show this message and exit.
 
     Commands:
       build  generate content
       cgi    run as CGI
       init   initialize project
+
 
 # See also
 - [Hugo](https://github.com/gohugoio/hugo) - similar idea, but written in Go and uses Go's templating engine

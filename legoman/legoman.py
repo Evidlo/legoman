@@ -7,11 +7,21 @@ import pkg_resources
 import os
 import sys
 
-# ---------- Config ----------
+@click.group()
+@click.option('--debug', default=False, is_flag=True)
+@click.option('--content_dir', default='content', metavar='PATH')
+@click.option('--output_dir', default='output', metavar='PATH')
+@click.option('--template_dir', default='templates', metavar='PATH')
+@click.pass_context
+def main(ctx, debug, content_dir, output_dir, template_dir):
+    if debug:
+        click.echo("Debugging enabled...")
+    # global content_dir, output_dir, template_dir
+    ctx.content_dir = Path(content_dir)
+    ctx.output_dir = Path(output_dir)
+    ctx.j2env = Environment(loader=FileSystemLoader([template_dir]))
 
-content_dir = Path('content')
-template_dir = Path('templates')
-output_dir = Path('output')
+# ---------- Config ----------
 
 md = markdown.Markdown(
     extensions=[
@@ -25,10 +35,8 @@ md = markdown.Markdown(
         }
     }
 )
-env = Environment(loader=FileSystemLoader(['templates', '.']))
-main = click.group()(lambda: None)
 
-def jinja_path(*patterns):
+def jinja_path(*patterns, content_dir):
     """Search through content_dir and find markdown files matching glob patterns
 
     Args:
@@ -51,7 +59,7 @@ def jinja_path(*patterns):
 
 # ---------- Rendering ----------
 
-def render_md(text):
+def render_md(text, j2env):
     """Render markdown to HTML
 
     Args:
@@ -64,10 +72,7 @@ def render_md(text):
     # get template
     if not 'template' in md.Meta:
         md.Meta['template'] = ['default.j2']
-    template_path = template_dir.joinpath(md.Meta['template'][0])
-    assert template_path.is_relative_to, "Template path must be subdir of template_dir"
-    # render to template
-    template = env.get_template(template_path.as_posix())
+    template = j2env.get_template(md.Meta['template'][0])
     return template.render(**{k:v[0] for k, v in md.Meta.items()}, content=html)
 
 
@@ -85,53 +90,50 @@ def render_j2(text):
 
 # ---------- Building ----------
 
-@click.command(short_help="generate content", help="generate output/ from content/")
-def build():
+@main.command(short_help="generate content", help="generate output/ from content/")
+@click.pass_context
+def build(ctx):
     """Loop content_dir and write rendered results to output_dir"""
 
-    for content_file in content_dir.rglob('*'):
-        output_file = output_dir.joinpath(content_file.relative_to(content_dir))
+    for content_file in ctx.parent.content_dir.rglob('*'):
+        output_file = ctx.parent.output_dir.joinpath(
+            content_file.relative_to(ctx.parent.content_dir)
+        )
         output_file.parent.mkdir(exist_ok=True)
-        print('parsing ' + content_file.as_posix())
+        click.echo('parsing ' + content_file.as_posix())
 
         if content_file.suffix.lower() == '.md':
             output_file.with_suffix('.html').write_text(
-                render_md(
-                    content_file.read_text()
-                )
+                render_md(content_file.read_text(), ctx.j2env)
             )
 
         elif content_file.suffix == '.j2':
             output_file.with_suffix('.html').write_text(
-                render_j2(content_file.read_text())
+                render_j2(content_file.read_text(), j2env)
             )
 
+        # symlink regular files to output_dir, replacing existing symlinks
         elif content_file.is_file():
-            # symlink regular files to output_dir, replacing existing symlinks
             if output_file.is_file():
                 output_file.unlink()
             os.link(str(content_file), str(output_file))
 
 
-@click.command(short_help="run as CGI", help="process file through stdin")
+@main.command(short_help="read file from stdin", help="read file from stdin")
 @click.argument("filetype", type=click.Choice(['md', 'j2']))
-def cgi(filetype):
+@click.pass_context
+def cgi(ctx, filetype):
     """Render text from stdin"""
     text = sys.stdin.read()
 
     if filetype == 'md':
-        print(render_md(text))
+        print(render_md(text, ctx.parent.j2env))
 
     if filetype == 'j2':
-        print(render_j2(text))
+        print(render_j2(text, ctx.parent.j2env))
 
 
-@click.command(short_help="initialize project", help="initialize project")
+@main.command(short_help="initialize project", help="initialize project")
 def init():
     """Copy skeleton project from demo folder"""
     copy_tree(pkg_resources.resource_filename(__name__, 'demo/'), '.')
-
-
-main.add_command(build)
-main.add_command(init)
-main.add_command(cgi)
