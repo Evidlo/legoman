@@ -63,8 +63,12 @@ Or for serving markdown with lighttpd:
 
     $HTTP["url"] =~ "\.md$" {
     	setenv.set-environment = ("TEMPLATE_DIR" => "/path/to/templates/")
-        cgi.assign = (".md"  => "/path/to/legoman_cgi")
+        cgi.assign = (
+            ".md"  => "/path/to/legoman_cgi",
+            ".j2"  => "/path/to/legoman_cgi",
+        )
     }
+
     
 # Usage
 
@@ -78,9 +82,9 @@ Or for serving markdown with lighttpd:
       --help               Show this message and exit.
 
     Commands:
-      build  generate content
-      cgi    run as CGI
-      init   initialize project
+      build   generate content
+      init    initialize project
+      single  render single file
 
 
 # See also
