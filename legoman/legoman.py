@@ -7,18 +7,30 @@ import pkg_resources
 import os
 import sys
 
+content_dir = output_dir = template_dir = j2env = None
+
 @click.group()
 @click.option('--debug', default=False, is_flag=True)
-@click.option('--content_dir', envvar='CONTENT_DIR', default='content', metavar='PATH')
-@click.option('--output_dir', envvar='OUTPUT_DIR', default='output', metavar='PATH')
-@click.option('--template_dir', envvar='TEMPLATE_DIR', default='templates', metavar='PATH')
-@click.pass_context
-def main(ctx, debug, content_dir, output_dir, template_dir):
+@click.option(
+    '--content_dir', 'contentdir', envvar='CONTENT_DIR',
+    default='content', metavar='PATH'
+)
+@click.option(
+    '--output_dir', 'outputdir', envvar='OUTPUT_DIR',
+    default='output', metavar='PATH'
+)
+@click.option(
+    '--template_dir', 'templatedir', envvar='TEMPLATE_DIR',
+    default='templates', metavar='PATH'
+)
+def main(debug, contentdir, outputdir, templatedir):
+    global content_dir, output_dir, template_dir, j2env
     if debug:
         click.echo("Debugging enabled...")
-    ctx.content_dir = Path(content_dir)
-    ctx.output_dir = Path(output_dir)
-    ctx.j2env = Environment(loader=FileSystemLoader([template_dir]))
+    content_dir = Path(contentdir)
+    output_dir = Path(outputdir)
+    template_dir = Path(templatedir)
+    j2env = Environment(loader=FileSystemLoader([template_dir]))
 
 # ---------- Config ----------
 
@@ -35,7 +47,7 @@ md = markdown.Markdown(
     }
 )
 
-def jinja_path(*patterns, content_dir):
+def jinja_path(*patterns):
     """Search through content_dir and find markdown files matching glob patterns
 
     Args:
@@ -75,7 +87,7 @@ def render_md(text, j2env):
     return template.render(**{k:v[0] for k, v in md.Meta.items()}, content=html)
 
 
-def render_j2(text):
+def render_j2(text, j2env):
     """Render Jinja2 to HTML
 
     Args:
@@ -84,26 +96,25 @@ def render_j2(text):
     Returns:
         str: rendered HTML
     """
-    template = env.from_string(text)
+    template = j2env.from_string(text)
     return template.render(path=jinja_path)
 
 # ---------- Building ----------
 
 @main.command(short_help="generate content", help="generate output/ from content/")
-@click.pass_context
-def build(ctx):
+def build():
     """Loop content_dir and write rendered results to output_dir"""
 
-    for content_file in ctx.parent.content_dir.rglob('*'):
-        output_file = ctx.parent.output_dir.joinpath(
-            content_file.relative_to(ctx.parent.content_dir)
+    for content_file in content_dir.rglob('*'):
+        output_file = output_dir.joinpath(
+            content_file.relative_to(content_dir)
         )
         output_file.parent.mkdir(exist_ok=True)
         click.echo('parsing ' + content_file.as_posix())
 
         if content_file.suffix.lower() == '.md':
             output_file.with_suffix('.html').write_text(
-                render_md(content_file.read_text(), ctx.j2env)
+                render_md(content_file.read_text(), j2env)
             )
 
         elif content_file.suffix == '.j2':
@@ -120,16 +131,15 @@ def build(ctx):
 
 @main.command(short_help="render single file", help="render single file")
 @click.argument('input_file')
-@click.pass_context
-def single(ctx, input_file):
+def single(input_file):
     """Render single file"""
     input_file = Path(input_file)
 
     if input_file.suffix.lower() == '.md':
-        print(render_md(input_file.read_text(), ctx.parent.j2env))
+        print(render_md(input_file.read_text(), j2env))
 
     if input_file.suffix.lower() == '.j2':
-        print(render_j2(input_file.read_text(), ctx.parent.j2env))
+        print(render_j2(input_file.read_text(), j2env))
 
 
 @main.command(short_help="initialize project", help="initialize project")
