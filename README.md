@@ -23,9 +23,7 @@ make devserver
 
 # How it works
 
-- `.md` files are rendered using the template specified in their frontmatter
-- `.j2` files are rendered with Jinja2. They can loop over `.md` files and access their metadata
-- all other files are symlinked to `output/`
+Files in `content/` are rendered and copied to `output/`, so the directory structure of your rendered website matches the structure of your source files.
 
 For example, the demo `content/`:
 ```
@@ -54,6 +52,18 @@ output
 │       └── index.html
 └── styles.css
 ```
+
+# CGI
+
+Legoman can also render files on the fly, which is useful for dynamically rendering files on a webserver.
+
+    echo '# hello world' | legoman cgi md
+    
+Or for serving markdown with lighttpd:
+
+    $HTTP["url"] =~ "\.md$" {
+        cgi.assign = ( ".md"  => "/path/to/legoman cgi md")
+    }
 
 # See also
 - [Hugo](https://github.com/gohugoio/hugo) - similar idea, but written in Go and uses Go's templating engine
