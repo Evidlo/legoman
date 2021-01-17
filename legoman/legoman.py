@@ -9,9 +9,9 @@ import sys
 
 @click.group()
 @click.option('--debug', default=False, is_flag=True)
-@click.option('--content_dir', default='content', metavar='PATH')
-@click.option('--output_dir', default='output', metavar='PATH')
-@click.option('--template_dir', default='templates', metavar='PATH')
+@click.option('--content_dir', envvar='CONTENT_DIR', default='content', metavar='PATH')
+@click.option('--output_dir', envvar='OUTPUT_DIR', default='output', metavar='PATH')
+@click.option('--template_dir', envvar='TEMPLATE_DIR', default='templates', metavar='PATH')
 @click.pass_context
 def main(ctx, debug, content_dir, output_dir, template_dir):
     if debug:
