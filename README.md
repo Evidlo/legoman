@@ -8,7 +8,7 @@ Supports TOC, image captions, LaTeX, code highlighting and tables.
 
 [Demo](http://evanw.org)
 
-# Usage
+# Quickstart
 
 ``` bash
 pip install legoman
