@@ -64,6 +64,18 @@ Or for serving markdown with lighttpd:
     $HTTP["url"] =~ "\.md$" {
         cgi.assign = ( ".md"  => "/path/to/legoman cgi md")
     }
+    
+# Usage
+
+    Usage: legoman [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      build  generate content
+      cgi    run as CGI
+      init   initialize project
 
 # See also
 - [Hugo](https://github.com/gohugoio/hugo) - similar idea, but written in Go and uses Go's templating engine
