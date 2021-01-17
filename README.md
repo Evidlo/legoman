@@ -55,14 +55,15 @@ output
 
 # CGI
 
-Legoman can also render files on the fly, which is useful for dynamically rendering files on a webserver.
+Legoman can also render files individually, which is useful for CGI scripts on a webserver.
 
-    echo '# hello world' | legoman cgi md
+    TEMPLATE_DIR=/path/to/templates legoman_cgi example.md
     
 Or for serving markdown with lighttpd:
 
     $HTTP["url"] =~ "\.md$" {
-        cgi.assign = ( ".md"  => "/path/to/legoman cgi md")
+    	setenv.set-environment = ("TEMPLATE_DIR" => "/path/to/templates/")
+        cgi.assign = (".md"  => "/path/to/legoman_cgi")
     }
     
 # Usage

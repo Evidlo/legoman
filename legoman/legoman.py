@@ -118,18 +118,18 @@ def build(ctx):
             os.link(str(content_file), str(output_file))
 
 
-@main.command(short_help="read file from stdin", help="read file from stdin")
-@click.argument("filetype", envvar='FILETYPE', type=click.Choice(['md', 'j2']))
+@main.command(short_help="render single file", help="render single file")
+@click.argument('input_file')
 @click.pass_context
-def cgi(ctx, filetype):
-    """Render text from stdin"""
-    text = sys.stdin.read()
+def single(ctx, input_file):
+    """Render single file"""
+    input_file = Path(input_file)
 
-    if filetype == 'md':
-        print(render_md(text, ctx.parent.j2env))
+    if input_file.suffix.lower() == '.md':
+        print(render_md(input_file.read_text(), ctx.parent.j2env))
 
-    if filetype == 'j2':
-        print(render_j2(text, ctx.parent.j2env))
+    if input_file.suffix.lower() == '.j2':
+        print(render_j2(input_file.read_text(), ctx.parent.j2env))
 
 
 @main.command(short_help="initialize project", help="initialize project")
