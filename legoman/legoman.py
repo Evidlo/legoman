@@ -47,25 +47,27 @@ md = markdown.Markdown(
     }
 )
 
-def jinja_path(*patterns):
-    """Search through content_dir and find markdown files matching glob patterns
+def getmeta(*patterns):
+    """Search through content_dir and get metadata of markdown files matching glob patterns
 
     Args:
         *patterns (list of str): glob patterns to search with
 
     Returns:
-        list of dict: where each dict
+        list of dict: each dict contains metadata for a markdown file
     """
     items = []
     for pattern in patterns:
         for path in content_dir.glob(pattern):
-            md.convert(path.read_text())
-            items.append(
-                {
-                    **{k:v[0] for k, v in md.Meta.items()},
-                    'path':path.relative_to(content_dir).with_suffix('.html')
-                }
-            )
+            # ignore broken symlinks, etc.
+            if path.exists():
+                md.convert(path.read_text())
+                items.append(
+                    {
+                        **{k:v[0] for k, v in md.Meta.items()},
+                        'path':path.relative_to(content_dir).with_suffix('.html')
+                    }
+                )
     return items
 
 # ---------- Rendering ----------
@@ -97,7 +99,7 @@ def render_j2(text, j2env):
         str: rendered HTML
     """
     template = j2env.from_string(text)
-    return template.render(path=jinja_path)
+    return template.render(getmeta=getmeta)
 
 # ---------- Building ----------
 
@@ -112,21 +114,27 @@ def build():
         output_file.parent.mkdir(exist_ok=True)
         click.echo('parsing ' + content_file.as_posix())
 
-        if content_file.suffix.lower() == '.md':
-            output_file.with_suffix('.html').write_text(
-                render_md(content_file.read_text(), j2env)
+        try:
+            if content_file.suffix.lower() == '.md':
+                output_file.with_suffix('.html').write_text(
+                    render_md(content_file.read_text(), j2env)
+                )
+
+            elif content_file.suffix == '.j2':
+                output_file.with_suffix('.html').write_text(
+                    render_j2(content_file.read_text(), j2env)
+                )
+            # symlink regular files to output_dir, replacing existing symlinks
+            elif content_file.is_file():
+                if output_file.is_file():
+                    output_file.unlink()
+                os.link(str(content_file), str(output_file))
+        except Exception as e:
+            click.echo('error parsing ' + content_file.as_posix())
+            click.echo(
+                click.style(str(type(e)) + ' ' + str(e), fg='red'),
             )
 
-        elif content_file.suffix == '.j2':
-            output_file.with_suffix('.html').write_text(
-                render_j2(content_file.read_text(), j2env)
-            )
-
-        # symlink regular files to output_dir, replacing existing symlinks
-        elif content_file.is_file():
-            if output_file.is_file():
-                output_file.unlink()
-            os.link(str(content_file), str(output_file))
 
 
 @main.command(short_help="render single file", help="render single file")
