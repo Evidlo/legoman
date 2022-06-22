@@ -47,25 +47,28 @@ md = markdown.Markdown(
     }
 )
 
-def getmeta(*patterns):
-    """Search through content_dir and get metadata of markdown files matching glob patterns
+def glob(*patterns):
+    """Loop through files matching glob patterns.  
 
     Args:
         *patterns (list of str): glob patterns to search with
 
     Returns:
-        list of dict: each dict contains metadata for a markdown file
+        list of dict: each dict contains frontmatter metadata for corresponding file
+            with additional `_path` attribute pointing to file
     """
     items = []
     for pattern in patterns:
         for path in content_dir.glob(pattern):
             # ignore broken symlinks, etc.
             if path.exists():
-                md.convert(path.read_text())
+                content = md.convert(path.read_text())
                 items.append(
                     {
                         **{k:v[0] for k, v in md.Meta.items()},
-                        'path':path.relative_to(content_dir).with_suffix('.html')
+                        '_path':path.relative_to(content_dir).with_suffix('.html'),
+                        '_parent':path.relative_to(content_dir).parent,
+                        '_content':content
                     }
                 )
     return items
@@ -99,7 +102,7 @@ def render_j2(text, j2env):
         str: rendered HTML
     """
     template = j2env.from_string(text)
-    return template.render(getmeta=getmeta)
+    return template.render(glob=glob)
 
 # ---------- Building ----------
 
@@ -108,6 +111,8 @@ def build():
     """Loop content_dir and write rendered results to output_dir"""
 
     for content_file in content_dir.rglob('*'):
+        if content_file.is_relative_to(output_dir) or content_file.is_relative_to(template_dir):
+            continue
         output_file = output_dir.joinpath(
             content_file.relative_to(content_dir)
         )
