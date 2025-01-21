@@ -10,13 +10,13 @@ devserver: output
 	# kill backgrounded process on exit
 	trap "exit" INT TERM
 	trap "kill 0" EXIT
-	# serve content
-	httpwatcher --root output --watch content,templates --port 8000 &
-	# wait for change and rebuild
+	# build and serve content
 	legoman build
-	while :; do
-		inotifywait -r -e modify --format %w content templates
-		legoman build
+	livereload output -t output -p 8000 -w 1 &
+	# wait for change and rebuild
+	inotifywait -mre modify --format %w%f content | while read path
+	do
+		legoman build $$path
 	done
 
 publish: html

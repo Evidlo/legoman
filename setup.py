@@ -25,7 +25,7 @@ setup(
         "colorama",
         "markdown",
         "python-markdown-math",
-        "httpwatcher",
+        "livereload",
         "mdx_include",
         "markdown_captions",
         "ghp-import",

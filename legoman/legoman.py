@@ -107,52 +107,48 @@ def render_j2(text, j2env):
 # ---------- Building ----------
 
 @main.command(short_help="generate content", help="generate output/ from content/")
-def build():
+@click.argument('content_file', required=False)
+def build(content_file):
     """Loop content_dir and write rendered results to output_dir"""
 
-    for content_file in content_dir.rglob('*'):
-        if content_file.is_relative_to(output_dir) or content_file.is_relative_to(template_dir):
-            continue
-        output_file = output_dir.joinpath(
-            content_file.relative_to(content_dir)
-        )
-        output_file.parent.mkdir(exist_ok=True)
-        click.echo('parsing ' + content_file.as_posix())
+    if content_file is not None:
+        single(content_file)
+    else:
+        for content_file in content_dir.rglob('*'):
+            if content_file.is_relative_to(output_dir) or content_file.is_relative_to(template_dir):
+                continue
+            single(content_file)
 
-        try:
-            if content_file.suffix.lower() == '.md':
-                output_file.with_suffix('.html').write_text(
-                    render_md(content_file.read_text(), j2env)
-                )
 
-            elif content_file.suffix == '.j2':
-                output_file.with_suffix('.html').write_text(
-                    render_j2(content_file.read_text(), j2env)
-                )
-            # symlink regular files to output_dir, replacing existing symlinks
-            elif content_file.is_file():
-                if output_file.is_file():
-                    output_file.unlink()
-                os.link(str(content_file), str(output_file))
-        except Exception as e:
-            click.echo('error parsing ' + content_file.as_posix())
-            click.echo(
-                click.style(str(type(e)) + ' ' + str(e), fg='red'),
+def single(content_file):
+    """Render single file"""
+    content_file = Path(content_file)
+    output_file = output_dir.joinpath(
+        content_file.relative_to(content_dir)
+    )
+    output_file.parent.mkdir(exist_ok=True)
+    click.echo('parsing ' + content_file.as_posix())
+
+    try:
+        if content_file.suffix.lower() == '.md':
+            output_file.with_suffix('.html').write_text(
+                render_md(content_file.read_text(), j2env)
             )
 
-
-
-@main.command(short_help="render single file", help="render single file")
-@click.argument('input_file')
-def single(input_file):
-    """Render single file"""
-    input_file = Path(input_file)
-
-    if input_file.suffix.lower() == '.md':
-        print(render_md(input_file.read_text(), j2env))
-
-    if input_file.suffix.lower() == '.j2':
-        print(render_j2(input_file.read_text(), j2env))
+        elif content_file.suffix == '.j2':
+            output_file.with_suffix('.html').write_text(
+                render_j2(content_file.read_text(), j2env)
+            )
+        # symlink regular files to output_dir, replacing existing symlinks
+        elif content_file.is_file():
+            if output_file.is_file():
+                output_file.unlink()
+            os.link(str(content_file), str(output_file))
+    except Exception as e:
+        click.echo('error parsing ' + content_file.as_posix())
+        click.echo(
+            click.style(str(type(e)) + ' ' + str(e), fg='red'),
+        )
 
 
 @main.command(short_help="initialize project", help="initialize project")
