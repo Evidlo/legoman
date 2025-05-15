@@ -43,6 +43,9 @@ md = markdown.Markdown(
     extension_configs = {
         'mdx_math': {
             'enable_dollar_delimiter': True
+        },
+        'toc': {
+            'anchorlink': True
         }
     }
 )
