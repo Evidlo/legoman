@@ -23,11 +23,11 @@ make devserver
 
 # How it works
 
-Files in `content/` are rendered and copied to `output/`, so the directory structure of your rendered website matches the structure of your source files.
+Files in the root directory are rendered and copied to `output/`, so the directory structure of your rendered website matches the structure of your source files.
 
-For example, the demo `content/`:
+For example, a project with this structure:
 ```
-content
+[project_root]
 ├── codehilite.css
 ├── index.j2
 ├── projects

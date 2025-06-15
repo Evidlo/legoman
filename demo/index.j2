@@ -5,7 +5,7 @@
 
 <img style="margin: auto;display: block;" src="https://i.imgur.com/YR1zWRG.png">
 <h2>Projects</h2>
-{% for project in glob('projects/**/*.md') %}
+{% for project in glob('projects/**/*.md')|frontmatter %}
 <p><a href="{{ project.path }}"><code>{{ project.title }}</code></a> - {{ project.description }}</p>
 {% endfor %}
 {% endblock %}

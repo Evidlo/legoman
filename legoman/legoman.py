@@ -6,14 +6,18 @@ from distutils.dir_util import copy_tree
 import pkg_resources
 import os
 import sys
+import logging
 
-content_dir = output_dir = template_dir = j2env = None
+log = logging.getLogger("legoman")
+logging.basicConfig()
+
+content_dir = output_dir = j2env = None
 
 @click.group()
 @click.option('--debug', default=False, is_flag=True)
 @click.option(
     '--content_dir', 'contentdir', envvar='CONTENT_DIR',
-    default='content', metavar='PATH'
+    default='.', metavar='PATH'
 )
 @click.option(
     '--output_dir', 'outputdir', envvar='OUTPUT_DIR',
@@ -26,11 +30,15 @@ content_dir = output_dir = template_dir = j2env = None
 def main(debug, contentdir, outputdir, templatedir):
     global content_dir, output_dir, template_dir, j2env
     if debug:
-        click.echo("Debugging enabled...")
+        log.setLevel(logging.DEBUG)
     content_dir = Path(contentdir)
     output_dir = Path(outputdir)
     template_dir = Path(templatedir)
+
     j2env = Environment(loader=FileSystemLoader([template_dir]))
+    # load macros and filters
+    j2env.filters.update({'fm': frontmatter})
+    j2env.globals.update({'glob': glob})
 
 # ---------- Config ----------
 
@@ -50,30 +58,42 @@ md = markdown.Markdown(
     }
 )
 
+# ---------- Filters & Functions ----------
+
 def glob(*patterns):
-    """Loop through files matching glob patterns.  
+    """Loop through files matching glob patterns.
 
     Args:
         *patterns (list of str): glob patterns to search with
 
     Returns:
-        list of dict: each dict contains frontmatter metadata for corresponding file
-            with additional `_path` attribute pointing to file
+        *paths (list of Path): paths to files
     """
     items = []
     for pattern in patterns:
         for path in content_dir.glob(pattern):
-            # ignore broken symlinks, etc.
             if path.exists():
-                content = md.convert(path.read_text())
-                items.append(
-                    {
-                        **{k:v[0] for k, v in md.Meta.items()},
-                        '_path':path.relative_to(content_dir).with_suffix('.html'),
-                        '_parent':path.relative_to(content_dir).parent,
-                        '_content':content
-                    }
-                )
+                items.append(path)
+    return items
+
+
+def frontmatter(paths, md=md):
+    """Loop through file paths and parse frontmatter
+
+    Args:
+        *paths (list of Path): paths to files with frontmatter
+    """
+    items = []
+    for path in paths:
+        content = md.convert(path.read_text())
+        items.append(
+            {
+                **{k:v[0] for k, v in md.Meta.items()},
+                'path':path.relative_to(content_dir).with_suffix('.html'),
+                'parent':path.relative_to(content_dir).parent,
+                'content':content
+            }
+        )
     return items
 
 # ---------- Rendering ----------
@@ -88,12 +108,10 @@ def render_md(text, j2env):
         str: rendered HTML
     """
     html = md.reset().convert(text)
-    # get template
     if not 'template' in md.Meta:
         md.Meta['template'] = ['default.j2']
     template = j2env.get_template(md.Meta['template'][0])
     return template.render(**{k:v[0] for k, v in md.Meta.items()}, content=html)
-
 
 def render_j2(text, j2env):
     """Render Jinja2 to HTML
@@ -105,7 +123,7 @@ def render_j2(text, j2env):
         str: rendered HTML
     """
     template = j2env.from_string(text)
-    return template.render(glob=glob)
+    return template.render()
 
 # ---------- Building ----------
 
@@ -118,10 +136,10 @@ def build(content_file):
         single(content_file)
     else:
         for content_file in content_dir.rglob('*'):
-            if content_file.is_relative_to(output_dir) or content_file.is_relative_to(template_dir):
+            if (content_file.is_relative_to(output_dir) or
+                content_file.is_relative_to(template_dir)):
                 continue
             single(content_file)
-
 
 def single(content_file):
     """Render single file"""
@@ -130,7 +148,7 @@ def single(content_file):
         content_file.relative_to(content_dir)
     )
     output_file.parent.mkdir(exist_ok=True)
-    click.echo('parsing ' + content_file.as_posix())
+    log.debug('parsing ' + content_file.as_posix())
 
     try:
         if content_file.suffix.lower() == '.md':
@@ -142,17 +160,15 @@ def single(content_file):
             output_file.with_suffix('.html').write_text(
                 render_j2(content_file.read_text(), j2env)
             )
-        # symlink regular files to output_dir, replacing existing symlinks
         elif content_file.is_file():
             if output_file.is_file():
                 output_file.unlink()
             os.link(str(content_file), str(output_file))
     except Exception as e:
-        click.echo('error parsing ' + content_file.as_posix())
-        click.echo(
+        log.error('error parsing ' + content_file.as_posix())
+        log.error(
             click.style(str(type(e)) + ' ' + str(e), fg='red'),
         )
-
 
 @main.command(short_help="initialize project", help="initialize project")
 def init():
