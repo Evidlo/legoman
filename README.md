@@ -1,6 +1,6 @@
 # legoman
 
-<img src="demo/content/man.svg" width=200>
+<img src="demo/man.svg" width=200>
 
 Simple static website generator.
 
