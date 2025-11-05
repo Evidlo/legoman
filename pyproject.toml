@@ -39,7 +39,6 @@ Issues = "https://github.com/evidlo/legoman/issues"
 [project.scripts]
 # if you want your code to be able to run directly from command line
 legoman = "legoman.legoman:main"
-legoman_cgi = "legoman/legoman_cgi"
 
 [tool.setuptools]
 include-package-data = true
@@ -49,5 +48,5 @@ include-package-data = true
 find = {}
 
 [build-system]
-requires = ["setuptools>=59.0.0"]
+requires = ["setuptools==61.0.0"]
 build-backend = 'setuptools.build_meta'
