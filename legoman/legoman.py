@@ -137,7 +137,8 @@ def build(content_file):
     else:
         for content_file in content_dir.rglob('*'):
             if (content_file.is_relative_to(output_dir) or
-                content_file.is_relative_to(template_dir)):
+                content_file.is_relative_to(template_dir) or
+                content_file.is_relative_to('.git')):
                 continue
             single(content_file)
 
