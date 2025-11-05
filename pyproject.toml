@@ -1,0 +1,53 @@
+[project]
+name = "legoman"
+version = "3.1.0"
+readme = "README.md"
+description = "a tiny static website generator"
+authors = [
+    { name = "Evan Widloski", email = "evan_gh@widloski.com" },
+]
+license = {text = "GPL-3.0"}
+keywords = ["static", "web", "generator", "jinja2", "markdown"]
+requires-python = ">=3.7"
+dependencies = [
+    "jinja2",
+    "colorama",
+    "markdown",
+    "python-markdown-math",
+    "livereload",
+    "mdx_include",
+    "markdown_captions",
+    "ghp-import",
+    "click"
+]
+classifiers = [
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
+Homepage = "https://github.com/evidlo/legoman"
+Repository = "https://github.com/evidlo/legoman"
+Issues = "https://github.com/evidlo/legoman/issues"
+
+[project.scripts]
+# if you want your code to be able to run directly from command line
+legoman = "legoman.legoman:main"
+legoman_cgi = "legoman/legoman_cgi"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages]
+# automatically look for subfolders with __init__.py
+find = {}
+
+[build-system]
+requires = ["setuptools>=59.0.0"]
+build-backend = 'setuptools.build_meta'
